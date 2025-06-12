@@ -266,11 +266,10 @@ const ExcelViewer: React.FC = () => {
   const handleResize = (colIndex: number, size: number) => {
     setColumnWidths((prev) => {
       const newWidths = [...prev];
-      newWidths[colIndex] = Math.max(50, newWidth);
+      newWidths[colIndex] = Math.max(50, size);
       return newWidths;
-    }
-    );
-  }
+    });
+  };
 
   // Range selection
   const handleRangeSelection = (rowIndex: number, colIndex: number, e: React.MouseEvent) => {
@@ -294,7 +293,7 @@ const ExcelViewer: React.FC = () => {
           row.slice(selectedRange.startCol, selectedRange.endCol + 1)
         );
         const newWb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(newWb, XLSX.utils.sheet_to_aoa(rangeData), 'SelectedRange');
+        XLSX.utils.book_append_sheet(newWb, XLSX.utils.aoa_to_sheet(rangeData), 'SelectedRange');
         const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
         saveAs(new Blob([wbout], { type: 'application/vnd.ms-excel' }), 'selected_range.xlsx');
       } else {
@@ -477,7 +476,6 @@ const ExcelViewer: React.FC = () => {
           >
             Excel File Viewer
           </motion.h1>
-       
         </div>
 
         <Card className="mb-6">
@@ -541,13 +539,15 @@ const ExcelViewer: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              placeholder="Search data..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-[200px]"
-              icon={<Search className="h-4 w-4" />}
-            />
+            <div className="relative w-[200px]">
+              <Input
+                placeholder="Search data..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
             <Button onClick={exportToExcel} className="flex items-center gap-2">
               <Download className="w-5 h-5" /> Excel{selectedRange ? ' (Range)' : ''}
             </Button>
