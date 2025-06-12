@@ -40,6 +40,21 @@ import {
   AlignHorizontalDistributeStart,
   LockKeyhole,
   FileSignature,
+  BookOpen,
+  ClipboardList,
+  Instagram,
+  Paintbrush,
+  FolderSearch,
+  Volume2,
+  UploadCloud,
+  ClipboardCheck,
+  MailCheck,
+  Mic,
+  Layers3,
+  Aperture,
+  Video,
+  Share2,
+  Star
 } from "lucide-react"
 
 const tools = [
@@ -78,8 +93,12 @@ const tools = [
   { title: "Calendar Converter", description: "Convert between calendar systems", icon: <CalendarClock className="h-8 w-8 text-primary" />, href: "/calendarconverter", badge: "Calendar" },
   { title: "Text Differencer", description: "Highlight differences between two text blocks", icon: <AlignVerticalDistributeEnd className="h-8 w-8 text-primary" />, href: "/textdeffchecker", badge: "Text Diff" },
   { title: "Secure Notes", description: "Write, encrypt, and decrypt notes", icon: <LockKeyhole className="h-8 w-8 text-primary" />, href: "/securenotes", badge: "Secure Notes" },
-  { title: " Short Cut Key   ", description: "Git  Short Key", icon: <LockKeyhole className="h-8 w-8 text-primary" />, href: "/shortcut/others", badge: "Shortcut" },
-
+  { title: "Shortcut Keys", description: "Git and general shortcut keys", icon: <ClipboardList className="h-8 w-8 text-primary" />, href: "/shortcut/others", badge: "Shortcut" },
+  { title: "Canva Clone", description: "Design templates with drag-and-drop", icon: <Paintbrush className="h-8 w-8 text-primary" />, href: "/canva-clone", badge: "Creative" },
+  { title: "Instagram Downloader", description: "Download media from Instagram", icon: <Instagram className="h-8 w-8 text-primary" />, href: "/instagram-downloader", badge: "Media" },
+  { title: "Book Reader", description: "Read and manage your digital books", icon: <BookOpen className="h-8 w-8 text-primary" />, href: "/book-reader", badge: "Reading" },
+  { title: "Audio Recorder", description: "Record audio from your microphone", icon: <Mic className="h-8 w-8 text-primary" />, href: "/audio-recorder", badge: "Audio" },
+  { title: "Resume Builder", description: "Generate professional resumes", icon: <FileSignature className="h-8 w-8 text-primary" />, href: "/resume-builder", badge: "Career" }
 ]
 
 export default function Home() {
@@ -87,7 +106,7 @@ export default function Home() {
     <div className="container mx-auto py-8 px-4">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold tracking-tight mb-2">Lala Tools</h1>
-        <p className="text-lg text-muted-foreground">A collection of 40+ simple, useful tools</p>
+        <p className="text-lg text-muted-foreground">A collection of 50+ simple, useful tools</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tools.map((tool) => (
