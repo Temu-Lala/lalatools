@@ -1,3 +1,4 @@
+ "use client"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -231,6 +232,41 @@ const tools = [
     icon: <MessageSquare className="h-8 w-8 text-primary" />,
     href: "/telegram-clone",
     badge: "New",
+  },
+    {
+    title: "Image to Base64 converter",
+    description: "convert your image to base64 ",
+    icon: <MessageSquare className="h-8 w-8 text-primary" />,
+    href: "/imagetobase64",
+    badge: "New",
+  },
+   {
+    title: "Excel file viewer",
+    description: "Excel file viewer  ",
+    icon: <MessageSquare className="h-8 w-8 text-primary" />,
+    href: "/excelfileviewer",
+    badge: "File",
+  },
+  {
+    title: "Convert the calender",
+    description: " Convert the calender",
+    icon: <MessageSquare className="h-8 w-8 text-primary" />,
+    href: "/calendarconverter",
+    badge: "Calendar",
+  },
+   {
+    title: "Text Deffrencer ",
+    description: " Text Deffrencer",
+    icon: <MessageSquare className="h-8 w-8 text-primary" />,
+    href: "/textdeffchecker",
+    badge: "Text Deffrencer",
+  },
+  {
+    title: "Secure Notes",
+    description: "Secure Notes App that allows users to write, encrypt, and decrypt notes",
+    icon: <MessageSquare className="h-8 w-8 text-primary" />,
+    href: "/securenotes",
+    badge: "Secure Notes",
   },
 ]
 

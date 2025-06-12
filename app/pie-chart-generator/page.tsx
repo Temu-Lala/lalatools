@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -107,6 +107,7 @@ export default function ChartGenerator() {
   const [chartSubtitle, setChartSubtitle] = useState("")
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<HTMLDivElement>(null)
+  const [isExporting, setIsExporting] = useState(false)
 
   const [chartSettings, setChartSettings] = useState<ChartSettings>({
     showLegend: true,
@@ -170,7 +171,6 @@ export default function ChartGenerator() {
     const sampleData = sampleDataSets[sampleKey as keyof typeof sampleDataSets]
     setData([...sampleData])
     
-    // Set appropriate chart type based on sample data
     if (sampleKey === 'monthlySales' || sampleKey === 'quarterlyGrowth') {
       setChartType('bar')
     } else {
@@ -235,55 +235,45 @@ export default function ChartGenerator() {
   }
 
   const exportAsImage = async () => {
-    if (!chartContainerRef.current) return
+    if (!chartContainerRef.current || isExporting) return
     
+    setIsExporting(true)
     try {
       // Create a temporary container for export
       const exportContainer = document.createElement('div')
-      exportContainer.className = 'export-container'
       exportContainer.style.position = 'fixed'
       exportContainer.style.left = '-9999px'
       exportContainer.style.top = '0'
       exportContainer.style.width = '800px'
-      exportContainer.style.height = '500px'
       exportContainer.style.backgroundColor = 'white'
       exportContainer.style.padding = '20px'
       exportContainer.style.boxSizing = 'border-box'
       
-      // Clone the chart content
+      // Clone the chart container
       const chartClone = chartContainerRef.current.cloneNode(true) as HTMLElement
       chartClone.style.width = '100%'
-      chartClone.style.height = '100%'
       chartClone.style.padding = '0'
+      chartClone.style.margin = '0'
       
-      // Add title and subtitle
-      const titleElement = document.createElement('h2')
-      titleElement.textContent = chartTitle
-      titleElement.style.textAlign = 'center'
-      titleElement.style.marginBottom = '10px'
-      titleElement.style.fontSize = '24px'
-      titleElement.style.color = '#333'
+      // Remove interactive elements
+      const buttons = chartClone.querySelectorAll('button')
+      buttons.forEach(button => button.remove())
       
-      const subtitleElement = document.createElement('p')
-      subtitleElement.textContent = chartSubtitle
-      subtitleElement.style.textAlign = 'center'
-      subtitleElement.style.marginBottom = '20px'
-      subtitleElement.style.fontSize = '16px'
-      subtitleElement.style.color = '#666'
-      
-      exportContainer.appendChild(titleElement)
-      if (chartSubtitle) exportContainer.appendChild(subtitleElement)
+      // Add to DOM
       exportContainer.appendChild(chartClone)
-      
       document.body.appendChild(exportContainer)
       
+      // Use html2canvas with specific options
       const canvas = await html2canvas(exportContainer, {
         backgroundColor: '#ffffff',
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
+        allowTaint: true,
+        removeContainer: true
       })
       
+      // Create download link
       const link = document.createElement('a')
       link.download = `${chartTitle.replace(/\s+/g, '_')}.png`
       link.href = canvas.toDataURL('image/png')
@@ -293,59 +283,51 @@ export default function ChartGenerator() {
       document.body.removeChild(exportContainer)
     } catch (error) {
       console.error('Error exporting image:', error)
+    } finally {
+      setIsExporting(false)
     }
   }
 
   const exportAsPDF = async () => {
-    if (!chartContainerRef.current) return
+    if (!chartContainerRef.current || isExporting) return
     
+    setIsExporting(true)
     try {
-      // Create a temporary container for export
+      // First export as image
       const exportContainer = document.createElement('div')
-      exportContainer.className = 'export-container'
       exportContainer.style.position = 'fixed'
       exportContainer.style.left = '-9999px'
       exportContainer.style.top = '0'
       exportContainer.style.width = '800px'
-      exportContainer.style.height = '500px'
       exportContainer.style.backgroundColor = 'white'
       exportContainer.style.padding = '20px'
       exportContainer.style.boxSizing = 'border-box'
       
-      // Clone the chart content
+      // Clone the chart container
       const chartClone = chartContainerRef.current.cloneNode(true) as HTMLElement
       chartClone.style.width = '100%'
-      chartClone.style.height = '100%'
       chartClone.style.padding = '0'
+      chartClone.style.margin = '0'
       
-      // Add title and subtitle
-      const titleElement = document.createElement('h2')
-      titleElement.textContent = chartTitle
-      titleElement.style.textAlign = 'center'
-      titleElement.style.marginBottom = '10px'
-      titleElement.style.fontSize = '24px'
-      titleElement.style.color = '#333'
+      // Remove interactive elements
+      const buttons = chartClone.querySelectorAll('button')
+      buttons.forEach(button => button.remove())
       
-      const subtitleElement = document.createElement('p')
-      subtitleElement.textContent = chartSubtitle
-      subtitleElement.style.textAlign = 'center'
-      subtitleElement.style.marginBottom = '20px'
-      subtitleElement.style.fontSize = '16px'
-      subtitleElement.style.color = '#666'
-      
-      exportContainer.appendChild(titleElement)
-      if (chartSubtitle) exportContainer.appendChild(subtitleElement)
+      // Add to DOM
       exportContainer.appendChild(chartClone)
-      
       document.body.appendChild(exportContainer)
       
+      // Use html2canvas with specific options
       const canvas = await html2canvas(exportContainer, {
         backgroundColor: '#ffffff',
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
+        allowTaint: true,
+        removeContainer: true
       })
       
+      // Convert to PDF
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF({
         orientation: 'landscape',
@@ -363,6 +345,8 @@ export default function ChartGenerator() {
       document.body.removeChild(exportContainer)
     } catch (error) {
       console.error('Error exporting PDF:', error)
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -929,13 +913,23 @@ export default function ChartGenerator() {
                       <Copy className="mr-2 h-4 w-4" />
                       Copy Chart Configuration
                     </Button>
-                    <Button onClick={exportAsImage} variant="outline" className="w-full">
+                    <Button 
+                      onClick={exportAsImage} 
+                      variant="outline" 
+                      className="w-full"
+                      disabled={isExporting}
+                    >
                       <Image className="mr-2 h-4 w-4" />
-                      Export as Image (PNG)
+                      {isExporting ? 'Exporting...' : 'Export as Image (PNG)'}
                     </Button>
-                    <Button onClick={exportAsPDF} variant="outline" className="w-full">
+                    <Button 
+                      onClick={exportAsPDF} 
+                      variant="outline" 
+                      className="w-full"
+                      disabled={isExporting}
+                    >
                       <FileText className="mr-2 h-4 w-4" />
-                      Export as PDF
+                      {isExporting ? 'Exporting...' : 'Export as PDF'}
                     </Button>
                   </div>
                   <div className="bg-muted p-4 rounded-lg">
