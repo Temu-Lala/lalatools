@@ -11,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { QrCode, Download, Copy, Check, RefreshCw, Smartphone, Wifi, Mail, Phone } from "lucide-react"
+import { QrCode, Download, Copy, Check, RefreshCw, Smartphone, Wifi, Mail, Phone, Image as ImageIcon } from "lucide-react"
 
 export default function QRCodeGenerator() {
-  const [text, setText] = useState("Hello World!")
+  const [text, setText] = useState(" type here  your text, URL, or data here")
   const [qrCodeDataURL, setQrCodeDataURL] = useState("")
   const [size, setSize] = useState([256])
   const [errorLevel, setErrorLevel] = useState("M")
@@ -23,7 +23,86 @@ export default function QRCodeGenerator() {
   const [lightColor, setLightColor] = useState("#ffffff")
   const [copied, setCopied] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [logoSize, setLogoSize] = useState([20]) // Percentage of QR code size
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+
+  // Handle logo file selection
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.match('image.*')) {
+      alert('Please select an image file')
+      return
+    }
+
+    setLogoFile(file)
+
+    // Create preview
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setLogoPreview(event.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Remove logo
+  const removeLogo = () => {
+    setLogoFile(null)
+    setLogoPreview(null)
+    if (logoInputRef.current) {
+      logoInputRef.current.value = ''
+    }
+    generateQRCode() // Regenerate without logo
+  }
+
+  // Draw logo on QR code
+  const drawLogoOnQR = (qrDataURL: string, callback: (dataURL: string) => void) => {
+    if (!logoPreview) {
+      callback(qrDataURL)
+      return
+    }
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const qrSize = size[0]
+    canvas.width = qrSize
+    canvas.height = qrSize
+
+    const qrImage = new window.Image()
+    qrImage.onload = () => {
+      // Draw QR code
+      ctx.drawImage(qrImage, 0, 0, qrSize, qrSize)
+
+      // Draw logo
+      const logoImage = new window.Image()
+      logoImage.onload = () => {
+        const logoWidth = (qrSize * logoSize[0]) / 100
+        const logoHeight = (qrSize * logoSize[0]) / 100
+        const x = (qrSize - logoWidth) / 2
+        const y = (qrSize - logoHeight) / 2
+
+        // Draw white background for logo
+        ctx.fillStyle = lightColor
+        ctx.fillRect(x - 2, y - 2, logoWidth + 4, logoHeight + 4)
+
+        // Draw logo
+        ctx.drawImage(logoImage, x, y, logoWidth, logoHeight)
+
+        const dataURL = canvas.toDataURL("image/png")
+        callback(dataURL)
+      }
+      logoImage.src = logoPreview
+    }
+    qrImage.src = qrDataURL
+  }
 
   // QR Code generation using QR Server API (reliable external service)
   const generateQRCode = async () => {
@@ -41,7 +120,7 @@ export default function QRCodeGenerator() {
       const apiURL = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodedText}&ecc=${errorLevel}&margin=${margin[0]}&color=${darkColorHex}&bgcolor=${lightColorHex}&format=png`
 
       // Test if the URL works by loading it
-      const img = new Image()
+      const img = new window.Image()
       img.crossOrigin = "anonymous"
 
       img.onload = () => {
@@ -57,14 +136,20 @@ export default function QRCodeGenerator() {
 
         ctx.drawImage(img, 0, 0, qrSize, qrSize)
         const dataURL = canvas.toDataURL("image/png")
-        setQrCodeDataURL(dataURL)
-        setIsGenerating(false)
+        
+        // Add logo if exists
+        drawLogoOnQR(dataURL, (finalDataURL) => {
+          setQrCodeDataURL(finalDataURL)
+          setIsGenerating(false)
+        })
       }
 
       img.onerror = () => {
         // Fallback: use the API URL directly
-        setQrCodeDataURL(apiURL)
-        setIsGenerating(false)
+        drawLogoOnQR(apiURL, (finalDataURL) => {
+          setQrCodeDataURL(finalDataURL)
+          setIsGenerating(false)
+        })
       }
 
       img.src = apiURL
@@ -113,8 +198,12 @@ export default function QRCodeGenerator() {
     }
 
     const dataURL = canvas.toDataURL("image/png")
-    setQrCodeDataURL(dataURL)
-    setIsGenerating(false)
+    
+    // Add logo if exists
+    drawLogoOnQR(dataURL, (finalDataURL) => {
+      setQrCodeDataURL(finalDataURL)
+      setIsGenerating(false)
+    })
   }
 
   // Create a deterministic pattern from text
@@ -186,7 +275,7 @@ export default function QRCodeGenerator() {
     }, 300) // Debounce to avoid too many API calls
 
     return () => clearTimeout(timeoutId)
-  }, [text, size, errorLevel, margin, darkColor, lightColor])
+  }, [text, size, errorLevel, margin, darkColor, lightColor, logoPreview, logoSize])
 
   const downloadQRCode = () => {
     if (!qrCodeDataURL) return
@@ -394,6 +483,69 @@ export default function QRCodeGenerator() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Logo Upload Section */}
+                  <div>
+                    <Label>Logo Center</Label>
+                    <div className="mt-2 space-y-2">
+                      {logoPreview ? (
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <img
+                              src={logoPreview}
+                              alt="Logo preview"
+                              className="h-16 w-16 object-contain border rounded"
+                            />
+                            <button
+                              onClick={removeLogo}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                              aria-label="Remove logo"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="flex-1">
+                            <Label>Logo Size: {logoSize[0]}%</Label>
+                            <Slider
+                              value={logoSize}
+                              onValueChange={setLogoSize}
+                              min={10}
+                              max={30}
+                              step={2}
+                              className="mt-2"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => logoInputRef.current?.click()}
+                            className="flex items-center gap-2"
+                          >
+                            <ImageIcon className="h-4 w-4" />
+                            Add Logo
+                          </Button>
+                          <input
+                            type="file"
+                            ref={logoInputRef}
+                            onChange={handleLogoUpload}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Optional: Add a logo to the center of your QR code
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      For best results, use a simple logo with transparent background
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -474,6 +626,12 @@ export default function QRCodeGenerator() {
                       <span>Format:</span>
                       <Badge variant="secondary">PNG</Badge>
                     </div>
+                    {logoPreview && (
+                      <div className="flex justify-between">
+                        <span>Logo Size:</span>
+                        <Badge variant="secondary">{logoSize[0]}%</Badge>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -486,6 +644,9 @@ export default function QRCodeGenerator() {
                     <li>• Test your QR code with multiple devices before use</li>
                     <li>• Higher error correction helps with damaged codes</li>
                     <li>• Ensure good lighting when scanning</li>
+                    {logoPreview && (
+                      <li>• Keep logo size under 30% for best scannability</li>
+                    )}
                   </ul>
                 </div>
 
