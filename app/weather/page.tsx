@@ -42,9 +42,11 @@ export default function Weather() {
     if (!city.trim()) return
 
     setLoading(true)
+
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`,
+        
       )
 
       if (!response.ok) {
@@ -78,10 +80,13 @@ export default function Weather() {
               <CardTitle>Weather Widget</CardTitle>
             </div>
             <CardDescription>Check current weather conditions by location</CardDescription>
+
           </CardHeader>
           <CardContent>
             <form onSubmit={fetchWeather} className="flex gap-2 mb-6">
+
               <Input
+                
                 placeholder="Enter city name..."
                 value={city}
                 onChange={(e) => setCity(e.target.value)}

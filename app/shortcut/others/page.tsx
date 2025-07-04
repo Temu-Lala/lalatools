@@ -937,7 +937,7 @@ const ShortcutsPage: React.FC<ShortcutsPageProps> = ({ darkMode }) => {
             {expandAll ? 'Collapse All' : 'Expand All'}
           </button>
         </div>
-
+              
         {/* Shortcut categories */}
         {Object.entries(filteredShortcuts).length === 0 ? (
           <p className="text-center text-gray-500">No shortcuts found for "{searchTerm}"</p>

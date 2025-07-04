@@ -1,19 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import CryptoJS from 'crypto-js';
-import { Lock, Unlock, Trash2, Sun, Moon, Save, Edit, Download, Upload, Search, X, FileText } from 'lucide-react';
-import jsPDF from 'jspdf';
-import { PDFDocument, rgb, RotationTypes } from 'pdf-lib';
-import ReactMarkdown from 'react-markdown';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism.css';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import CryptoJS from "crypto-js";
+import {
+  Lock,
+  Unlock,
+  Trash2,
+  Sun,
+  Moon,
+  Save,
+  Edit,
+  Download,
+  Upload,
+  Search,
+  X,
+  FileText,
+} from "lucide-react";
+import jsPDF from "jspdf";
+import { PDFDocument, rgb, RotationTypes } from "pdf-lib";
+import ReactMarkdown from "react-markdown";
+import Prism from "prismjs";
+import "prismjs/themes/prism.css";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface Note {
   id: string;
@@ -25,46 +43,46 @@ interface Note {
 
 export default function SecureNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [password, setPassword] = useState('');
-  const [theme, setTheme] = useState('light');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [password, setPassword] = useState("");
+  const [theme, setTheme] = useState("light");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem('notes');
+    const savedNotes = localStorage.getItem("notes");
     if (savedNotes) {
       setNotes(JSON.parse(savedNotes));
     }
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
     Prism.highlightAll();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('notes', JSON.stringify(notes));
+    localStorage.setItem("notes", JSON.stringify(notes));
     Prism.highlightAll();
   }, [notes, selectedNote]);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
+    const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   const encryptNote = (text: string, password: string) => {
     try {
       return CryptoJS.AES.encrypt(text, password).toString();
     } catch (err) {
-      setError('Encryption failed. Please try again.');
+      setError("Encryption failed. Please try again.");
       return null;
     }
   };
@@ -74,18 +92,19 @@ export default function SecureNotes() {
       const bytes = CryptoJS.AES.decrypt(encryptedText, password);
       const decrypted = bytes.toString(CryptoJS.enc.Utf8);
       if (!decrypted) {
-        throw new Error('Invalid password or corrupted data');
+        throw new Error("Invalid password or corrupted data");
       }
       return decrypted;
     } catch (err) {
-      setError('Decryption failed. Please check your password.');
+      setError("Decryption failed. Please check your password.");
+
       return null;
     }
   };
 
   const handleSaveNote = () => {
     if (!title || !content || !password) {
-      setError('Please fill in all fields.');
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -101,17 +120,17 @@ export default function SecureNotes() {
     };
 
     setNotes([...notes, newNote]);
-    setTitle('');
-    setContent('');
-    setPassword('');
-    setError('');
-    setSuccess('Note saved successfully!');
-    setTimeout(() => setSuccess(''), 3000);
+    setTitle("");
+    setContent("");
+    setPassword("");
+    setError("");
+    setSuccess("Note saved successfully!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleEditNote = () => {
     if (!selectedNote || !title || !content || !password) {
-      setError('Please fill in all fields.');
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -126,45 +145,47 @@ export default function SecureNotes() {
       createdAt: selectedNote.createdAt,
     };
 
-    setNotes(notes.map((note) => (note.id === selectedNote.id ? updatedNote : note)));
+    setNotes(
+      notes.map((note) => (note.id === selectedNote.id ? updatedNote : note))
+    );
     setSelectedNote(null);
     setIsEditing(false);
-    setTitle('');
-    setContent('');
-    setPassword('');
-    setError('');
-    setSuccess('Note updated successfully!');
-    setTimeout(() => setSuccess(''), 3000);
+    setTitle("");
+    setContent("");
+    setPassword("");
+    setError("");
+    setSuccess("Note updated successfully!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleDecryptNote = (note: Note) => {
     if (!password) {
-      setError('Please enter a password to decrypt.');
+      setError("Please enter a password to decrypt.");
       return;
     }
 
     const decryptedContent = decryptNote(note.content, password);
     if (decryptedContent) {
       setSelectedNote({ ...note, content: decryptedContent, encrypted: false });
-      setError('');
-      setSuccess('Note decrypted successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setError("");
+      setSuccess("Note decrypted successfully!");
+      setTimeout(() => setSuccess(""), 3000);
     }
   };
 
   const handleDeleteNote = (id: string) => {
     setNotes(notes.filter((note) => note.id !== id));
     setSelectedNote(null);
-    setPassword('');
-    setError('');
-    setSuccess('Note deleted successfully!');
-    setTimeout(() => setSuccess(''), 3000);
+    setPassword("");
+    setError("");
+    setSuccess("Note deleted successfully!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleSelectNote = (note: Note) => {
     setSelectedNote(note);
-    setPassword('');
-    setError('');
+    setPassword("");
+    setError("");
     setIsEditing(false);
     setPdfPreview(null);
   };
@@ -176,66 +197,67 @@ export default function SecureNotes() {
     if (decryptedContent) {
       setContent(decryptedContent);
       setIsEditing(true);
-      setError('');
+      setError("");
     } else {
-      setError('Please enter the correct password to edit.');
+      setError("Please enter the correct password to edit.");
     }
   };
 
   const createEncryptedPdfBlob = async (note: Note) => {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([600, 400]);
-    
-    page.drawText('Encrypted Secure Note', {
+
+    page.drawText("Encrypted Secure Note", {
       x: 50,
       y: 350,
       size: 24,
       color: rgb(0, 0, 0),
     });
-    
+
     page.drawText(`Title: ${note.title}`, {
       x: 50,
       y: 300,
       size: 14,
       color: rgb(0, 0, 0),
     });
-    
+
     page.drawText(`Created: ${new Date(note.createdAt).toLocaleString()}`, {
       x: 50,
       y: 280,
       size: 12,
       color: rgb(0, 0, 0),
     });
-    
-    page.drawText('Note: This content is encrypted. Upload to decrypt.', {
+
+    page.drawText("Note: This content is encrypted. Upload to decrypt.", {
       x: 50,
       y: 250,
       size: 12,
       color: rgb(0, 0, 0),
     });
-    
-    page.drawText('Encrypted Content:', {
+
+    page.drawText("Encrypted Content:", {
       x: 50,
       y: 220,
       size: 12,
       color: rgb(0, 0, 0),
     });
-    
+
     // Split content into lines to fit in PDF
     const lines = [];
-    let currentLine = '';
-    for (const word of note.content.split(' ')) {
+    let currentLine = "";
+    for (const word of note.content.split(" ")) {
       if (currentLine.length + word.length > 80) {
         lines.push(currentLine);
         currentLine = word;
       } else {
-        currentLine += (currentLine ? ' ' : '') + word;
+        currentLine += (currentLine ? " " : "") + word;
       }
     }
     if (currentLine) lines.push(currentLine);
-    
+
     let yPosition = 200;
-    for (const line of lines.slice(0, 10)) { // Show first 10 lines
+    for (const line of lines.slice(0, 10)) {
+      // Show first 10 lines
       page.drawText(line, {
         x: 50,
         y: yPosition,
@@ -244,42 +266,42 @@ export default function SecureNotes() {
       });
       yPosition -= 15;
     }
-    
+
     if (lines.length > 10) {
-      page.drawText('[...content truncated...]', {
+      page.drawText("[...content truncated...]", {
         x: 50,
         y: yPosition,
         size: 10,
         color: rgb(0.5, 0.5, 0.5),
       });
     }
-    
-    page.drawText('Generated by LALA ToolKit', {
+
+    page.drawText("Generated by LALA ToolKit", {
       x: 300,
       y: 30,
       size: 10,
       color: rgb(0.5, 0.5, 0.5),
     });
-    
+
     const pdfBytes = await pdfDoc.save();
-    return new Blob([pdfBytes], { type: 'application/pdf' });
+    return new Blob([pdfBytes], { type: "application/pdf" });
   };
 
   const handleDownloadEncryptedPDF = async (note: Note) => {
     try {
       const blob = await createEncryptedPdfBlob(note);
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `Encrypted_${note.title}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setSuccess('Encrypted PDF downloaded successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Encrypted PDF downloaded successfully!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError('Failed to generate PDF. Please try again.');
+      setError("Failed to generate PDF. Please try again.");
     }
   };
 
@@ -288,25 +310,25 @@ export default function SecureNotes() {
       const blob = await createEncryptedPdfBlob(note);
       const url = URL.createObjectURL(blob);
       setPdfPreview(url);
-      setSuccess('Encrypted PDF preview generated!');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Encrypted PDF preview generated!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError('Failed to generate PDF preview. Please try again.');
+      setError("Failed to generate PDF preview. Please try again.");
     }
   };
 
   const handleDownloadDecryptedPDF = async (note: Note) => {
     if (note.encrypted) {
-      setError('Please decrypt the note before downloading as decrypted PDF.');
+      setError("Please decrypt the note before downloading as decrypted PDF.");
       return;
     }
 
     try {
       const pdfDoc = await PDFDocument.create();
       const page = pdfDoc.addPage([600, 400]);
-      
+
       // Watermark
-      page.drawText('LALA ToolKit', {
+      page.drawText("LALA ToolKit", {
         x: 300,
         y: 200,
         size: 40,
@@ -314,7 +336,7 @@ export default function SecureNotes() {
         rotate: { type: RotationTypes.Degrees, angle: 45 },
         opacity: 0.5,
       });
-      
+
       // Header
       page.drawRectangle({
         x: 0,
@@ -323,14 +345,14 @@ export default function SecureNotes() {
         height: 30,
         color: rgb(0.23, 0.51, 0.96),
       });
-      
-      page.drawText('Secure Note', {
+
+      page.drawText("Secure Note", {
         x: 300,
         y: 380,
         size: 16,
         color: rgb(1, 1, 1),
       });
-      
+
       // Title
       page.drawText(note.title, {
         x: 50,
@@ -338,11 +360,12 @@ export default function SecureNotes() {
         size: 18,
         color: rgb(0, 0, 0),
       });
-      
+
       // Content
-      const lines = note.content.split('\n');
+      const lines = note.content.split("\n");
       let yPosition = 300;
-      for (const line of lines.slice(0, 20)) { // Show first 20 lines
+      for (const line of lines.slice(0, 20)) {
+        // Show first 20 lines
         page.drawText(line, {
           x: 50,
           y: yPosition,
@@ -351,16 +374,16 @@ export default function SecureNotes() {
         });
         yPosition -= 15;
       }
-      
+
       if (lines.length > 20) {
-        page.drawText('[...content truncated...]', {
+        page.drawText("[...content truncated...]", {
           x: 50,
           y: yPosition,
           size: 10,
           color: rgb(0.5, 0.5, 0.5),
         });
       }
-      
+
       // Footer
       page.drawText(`Created: ${new Date(note.createdAt).toLocaleString()}`, {
         x: 50,
@@ -368,14 +391,14 @@ export default function SecureNotes() {
         size: 10,
         color: rgb(0.5, 0.5, 0.5),
       });
-      
-      page.drawText('Generated by LALA ToolKit', {
+
+      page.drawText("Generated by LALA ToolKit", {
         x: 300,
         y: 30,
         size: 10,
         color: rgb(0.5, 0.5, 0.5),
       });
-      
+
       // Border
       page.drawRectangle({
         x: 20,
@@ -385,28 +408,30 @@ export default function SecureNotes() {
         borderColor: rgb(0.23, 0.51, 0.96),
         borderWidth: 1,
       });
-      
+
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `${note.title}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setSuccess('Decrypted PDF downloaded successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Decrypted PDF downloaded successfully!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError('Failed to generate PDF. Please try again.');
+      setError("Failed to generate PDF. Please try again.");
     }
   };
 
-  const handleUploadPDF = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadPDF = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (!file || !file.name.endsWith('.pdf')) {
-      setError('Please upload a valid PDF file.');
+    if (!file || !file.name.endsWith(".pdf")) {
+      setError("Please upload a valid PDF file.");
       return;
     }
 
@@ -418,42 +443,48 @@ export default function SecureNotes() {
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pages = pdfDoc.getPages();
-      
+
       // Since we can't extract text directly, we assume the encrypted content is stored as per createEncryptedPdfBlob.
       // We use the same pattern-matching logic, but note that this is a simplification.
       // The encrypted content is stored in the note.content field when uploaded.
-      const encryptedContent = notes.find((note) => note.title.includes(file.name.replace('.pdf', '')))?.content;
-      
+      const encryptedContent = notes.find((note) =>
+        note.title.includes(file.name.replace(".pdf", ""))
+      )?.content;
+
       if (!encryptedContent) {
-        setError('No encrypted content found for this PDF. Make sure it was created by this app.');
+        setError(
+          "No encrypted content found for this PDF. Make sure it was created by this app."
+        );
         return;
       }
-      
+
       if (!password) {
-        setError('Please enter a password to decrypt the uploaded note.');
+        setError("Please enter a password to decrypt the uploaded note.");
         return;
       }
-      
+
       const decryptedContent = decryptNote(encryptedContent, password);
       if (decryptedContent) {
         const newNote: Note = {
           id: Date.now().toString(),
-          title: `Uploaded: ${file.name.replace('.pdf', '')}`,
+          title: `Uploaded: ${file.name.replace(".pdf", "")}`,
           content: decryptedContent,
           encrypted: false,
           createdAt: new Date().toISOString(),
         };
         setNotes([...notes, newNote]);
         setSelectedNote(newNote);
-        setError('');
-        setSuccess('PDF uploaded and decrypted successfully!');
-        setTimeout(() => setSuccess(''), 3000);
+        setError("");
+        setSuccess("PDF uploaded and decrypted successfully!");
+        setTimeout(() => setSuccess(""), 3000);
       }
     } catch (err) {
-      console.error('PDF processing error:', err);
-      setError('Failed to process PDF. Please check the password or try another file.');
+      console.error("PDF processing error:", err);
+      setError(
+        "Failed to process PDF. Please check the password or try another file."
+      );
     }
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const filteredNotes = notes.filter((note) =>
@@ -468,7 +499,10 @@ export default function SecureNotes() {
         </h1>
         <div className="flex items-center space-x-4">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+            <Search
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+              size={20}
+            />
             <Input
               type="text"
               placeholder="Search notes..."
@@ -481,11 +515,15 @@ export default function SecureNotes() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                  {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+                  {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}</p>
+                <p>
+                  {theme === "light"
+                    ? "Switch to dark mode"
+                    : "Switch to light mode"}
+                </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -502,7 +540,7 @@ export default function SecureNotes() {
               className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 p-4 rounded-lg mb-4 flex justify-between items-center shadow-md"
             >
               <span>{error}</span>
-              <Button variant="ghost" size="icon" onClick={() => setError('')}>
+              <Button variant="ghost" size="icon" onClick={() => setError("")}>
                 <X size={20} />
               </Button>
             </motion.div>
@@ -515,7 +553,11 @@ export default function SecureNotes() {
               className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 p-4 rounded-lg mb-4 flex justify-between items-center shadow-md"
             >
               <span>{success}</span>
-              <Button variant="ghost" size="icon" onClick={() => setSuccess('')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSuccess("")}
+              >
                 <X size={20} />
               </Button>
             </motion.div>
@@ -527,7 +569,9 @@ export default function SecureNotes() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl mb-6"
         >
-          <h2 className="text-xl font-bold mb-4">{isEditing ? 'Edit Note' : 'Create New Note'}</h2>
+          <h2 className="text-xl font-bold mb-4">
+            {isEditing ? "Edit Note" : "Create New Note"}
+          </h2>
           <Input
             type="text"
             placeholder="Note Title"
@@ -554,11 +598,12 @@ export default function SecureNotes() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button onClick={isEditing ? handleEditNote : handleSaveNote}>
-                    <Save size={20} className="mr-2" /> {isEditing ? 'Update Note' : 'Save Note'}
+                    <Save size={20} className="mr-2" />{" "}
+                    {isEditing ? "Update Note" : "Save Note"}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{isEditing ? 'Update note' : 'Save note'}</p>
+                  <p>{isEditing ? "Update note" : "Save note"}</p>
                 </TooltipContent>
               </Tooltip>
               {isEditing && (
@@ -568,9 +613,9 @@ export default function SecureNotes() {
                       variant="outline"
                       onClick={() => {
                         setIsEditing(false);
-                        setTitle('');
-                        setContent('');
-                        setPassword('');
+                        setTitle("");
+                        setContent("");
+                        setPassword("");
                         setSelectedNote(null);
                       }}
                     >
@@ -587,7 +632,9 @@ export default function SecureNotes() {
         </motion.div>
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">Your Notes ({filteredNotes.length})</h2>
+          <h2 className="text-xl font-bold mb-4">
+            Your Notes ({filteredNotes.length})
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
               {filteredNotes.map((note) => (
@@ -602,14 +649,19 @@ export default function SecureNotes() {
                     <div>
                       <h3 className="text-lg font-semibold">{note.title}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {note.encrypted ? 'Encrypted' : 'Decrypted'} • {new Date(note.createdAt).toLocaleString()}
+                        {note.encrypted ? "Encrypted" : "Decrypted"} •{" "}
+                        {new Date(note.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex space-x-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleSelectNote(note)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleSelectNote(note)}
+                            >
                               <Edit size={20} />
                             </Button>
                           </TooltipTrigger>
@@ -619,7 +671,11 @@ export default function SecureNotes() {
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleEditSelectNote(note)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditSelectNote(note)}
+                            >
                               <Edit size={20} className="text-yellow-500" />
                             </Button>
                           </TooltipTrigger>
@@ -629,7 +685,11 @@ export default function SecureNotes() {
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handlePreviewEncryptedPDF(note)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handlePreviewEncryptedPDF(note)}
+                            >
                               <FileText size={20} className="text-blue-500" />
                             </Button>
                           </TooltipTrigger>
@@ -639,7 +699,11 @@ export default function SecureNotes() {
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleDownloadEncryptedPDF(note)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDownloadEncryptedPDF(note)}
+                            >
                               <Download size={20} className="text-purple-500" />
                             </Button>
                           </TooltipTrigger>
@@ -649,7 +713,11 @@ export default function SecureNotes() {
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteNote(note.id)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteNote(note.id)}
+                            >
                               <Trash2 size={20} className="text-red-500" />
                             </Button>
                           </TooltipTrigger>
@@ -675,7 +743,9 @@ export default function SecureNotes() {
             <h2 className="text-2xl font-bold mb-4">{selectedNote.title}</h2>
             {selectedNote.encrypted ? (
               <>
-                <p className="text-gray-500 dark:text-gray-400 mb-4">This note is encrypted. Enter the password to decrypt.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  This note is encrypted. Enter the password to decrypt.
+                </p>
                 <Input
                   type="password"
                   placeholder="Decryption Password"
@@ -700,13 +770,16 @@ export default function SecureNotes() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" onClick={() => setPdfPreview(null)}>
+                          <Button
+                            variant="outline"
+                            onClick={() => setPdfPreview(null)}
+                          >
                             <X size={20} className="mr-2" /> Close Preview
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Close PDF preview</p>
-                          </TooltipContent>
+                        </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}
@@ -718,10 +791,12 @@ export default function SecureNotes() {
                   <ReactMarkdown
                     components={{
                       code({ node, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        return node.tagName === 'code' && match ? (
+                        const match = /language-(\w+)/.exec(className || "");
+                        return node.tagName === "code" && match ? (
                           <pre className={`language-${match[1]}`}>
-                            <code className={`language-${match[1]}`}>{children}</code>
+                            <code className={`language-${match[1]}`}>
+                              {children}
+                            </code>
                           </pre>
                         ) : (
                           <code className={className} {...props}>
@@ -738,7 +813,11 @@ export default function SecureNotes() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button onClick={() => handleDownloadDecryptedPDF(selectedNote)}>
+                        <Button
+                          onClick={() =>
+                            handleDownloadDecryptedPDF(selectedNote)
+                          }
+                        >
                           <Download size={20} className="mr-2" /> Download PDF
                         </Button>
                       </TooltipTrigger>
@@ -750,22 +829,25 @@ export default function SecureNotes() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => {
                             if (!password) {
-                              setError('Please enter an encryption password');
+                              setError("Please enter an encryption password");
                               return;
                             }
-                            const encryptedContent = encryptNote(selectedNote.content, password);
+                            const encryptedContent = encryptNote(
+                              selectedNote.content,
+                              password
+                            );
                             if (encryptedContent) {
                               setSelectedNote({
                                 ...selectedNote,
                                 content: encryptedContent,
-                                encrypted: true
+                                encrypted: true,
                               });
-                              setSuccess('Note re-encrypted successfully!');
-                              setTimeout(() => setSuccess(''), 3000);
+                              setSuccess("Note re-encrypted successfully!");
+                              setTimeout(() => setSuccess(""), 3000);
                             }
                           }}
                         >
@@ -782,9 +864,9 @@ export default function SecureNotes() {
             )}
             {pdfPreview && (
               <div className="mt-6 border rounded-lg overflow-hidden">
-                <iframe 
-                  src={pdfPreview} 
-                  width="100%" 
+                <iframe
+                  src={pdfPreview}
+                  width="100%"
                   height="500px"
                   className="border-0"
                   title="PDF Preview"
@@ -833,7 +915,7 @@ export default function SecureNotes() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            
+
             {selectedNote && !selectedNote.encrypted && (
               <div>
                 <h3 className="font-medium mb-2">Create Encrypted PDF</h3>
@@ -848,24 +930,28 @@ export default function SecureNotes() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
+                        <Button
                           onClick={async () => {
                             if (!password) {
-                              setError('Please enter an encryption password');
+                              setError("Please enter an encryption password");
                               return;
                             }
-                            const encryptedContent = encryptNote(selectedNote.content, password);
+                            const encryptedContent = encryptNote(
+                              selectedNote.content,
+                              password
+                            );
                             if (encryptedContent) {
                               const tempNote = {
                                 ...selectedNote,
                                 content: encryptedContent,
-                                encrypted: true
+                                encrypted: true,
                               };
                               await handlePreviewEncryptedPDF(tempNote);
                             }
                           }}
                         >
-                          <FileText size={20} className="mr-2" /> Preview Encrypted
+                          <FileText size={20} className="mr-2" /> Preview
+                          Encrypted
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -876,25 +962,29 @@ export default function SecureNotes() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
+                        <Button
                           variant="outline"
                           onClick={async () => {
                             if (!password) {
-                              setError('Please enter an encryption password');
+                              setError("Please enter an encryption password");
                               return;
                             }
-                            const encryptedContent = encryptNote(selectedNote.content, password);
+                            const encryptedContent = encryptNote(
+                              selectedNote.content,
+                              password
+                            );
                             if (encryptedContent) {
                               const tempNote = {
                                 ...selectedNote,
                                 content: encryptedContent,
-                                encrypted: true
+                                encrypted: true,
                               };
                               await handleDownloadEncryptedPDF(tempNote);
                             }
                           }}
                         >
-                          <Download size={20} className="mr-2" /> Download Encrypted
+                          <Download size={20} className="mr-2" /> Download
+                          Encrypted
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
