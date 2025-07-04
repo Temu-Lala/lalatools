@@ -8,7 +8,7 @@ export function Footer() {
           © {new Date().getFullYear()} LALA Tools
         </p>
 
-        <span> Made By Bereket K</span>
+        {/* <span> Made By Bereket K</span> */}
         <Link
           href="http://github.com/bekione"
           //           href="https://temesgen-debebe.vercel.app/"
