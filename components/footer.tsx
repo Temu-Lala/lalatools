@@ -17,8 +17,8 @@ export function Footer() {
           rel="noopener noreferrer"
           className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center gap-1"
         >
-          <span>Check My Portfolio & Projects</span>
           <span> Made By Bereket K</span>
+          {/* <span> Made By Bereket K</span> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
