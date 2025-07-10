@@ -8,17 +8,17 @@ export function Footer() {
           © {new Date().getFullYear()} LALA Tools
         </p>
 
-        {/* <span> Made By Bereket K</span> */}
+        {/* <span> Made By Temesgen  K</span> */}
         <Link
-          href="http://github.com/bekione"
+          href="href="https://temesgen-debebe.vercel.app/"
           //           href="https://temesgen-debebe.vercel.app/"
 
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center gap-1"
         >
-          <span> Made By Bereket K</span>
-          {/* <span> Made By Bereket K</span> */}
+          <span> Made By Temesgen (Lala) K</span>
+          {/* <span> Made By Temesgen K</span> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
