@@ -1,24 +1,20 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-export function Footer() {
+export default function Footer() {
   return (
-    <footer className="border-t py-6 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0">
-        <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} LALA Tools
+    <footer className="bg-gray-100 py-4">
+      <div className="container mx-auto text-center">
+        <p className="text-sm text-gray-600">
+          © {new Date().getFullYear()} Lala Tools. All rights reserved.
         </p>
 
-        {/* <span> Made By Temesgen  K</span> */}
         <Link
-          href="href="https://temesgen-debebe.vercel.app/"
-          //           href="https://temesgen-debebe.vercel.app/"
-
+          href="https://temesgen-debebe.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center gap-1"
+          className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center justify-center gap-1 mt-2"
         >
-          <span> Made By Temesgen (Lala) K</span>
-          {/* <span> Made By Temesgen K</span> */}
+          <span>Made By Temesgen (Lala) K</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
