@@ -14,7 +14,7 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="text-sm font-semibold text-blue-400 hover:text-blue-900 transition-colors duration-300 flex items-center justify-center gap-1 mt-2"
         >
-          <span>Made By Temesgen (Lala) K</span>
+          <span>Made By Temesgen (Lala) </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
