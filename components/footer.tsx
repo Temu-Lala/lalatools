@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -12,7 +12,7 @@ export default function Footer() {
           href="https://temesgen-debebe.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center justify-center gap-1 mt-2"
+          className="text-sm font-semibold text-blue-400 hover:text-blue-900 transition-colors duration-300 flex items-center justify-center gap-1 mt-2"
         >
           <span>Made By Temesgen (Lala) K</span>
           <svg
